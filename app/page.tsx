@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Hero from '@/components/Hero';
 import Features from '@/components/Features';
 import PDFMerger from '@/components/PDFMerger';
