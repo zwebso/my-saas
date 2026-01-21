@@ -10,8 +10,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data } = await supabase.auth.getUser()
+      setUser(data.user as User | null)
       setLoading(false)
     }
 
