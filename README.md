@@ -38,3 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 =======
 # my-saas
 >>>>>>> 7179bc561585162e2f31afa8ddf8a07e4e0e1026
+# Fixed TypeScript config
