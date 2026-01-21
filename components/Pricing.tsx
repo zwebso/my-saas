@@ -1,4 +1,28 @@
+'use client'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabase'
+import { useEffect, useState } from 'react'
+
 export default function Pricing() {
+  const router = useRouter()
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      setUser(user)
+    }
+    getUser()
+  }, [])
+
+  const handleCTA = (planName) => {
+    if (!user) {
+      router.push('/auth')
+    } else {
+      router.push('/dashboard')
+    }
+  }
+
   const plans = [
     {
       name: "Free",
@@ -42,7 +66,7 @@ export default function Pricing() {
       cta: "Contact Sales",
       highlighted: false
     }
-  ];
+  ]
 
   return (
     <section className="py-20 px-4 bg-blue-50">
@@ -101,6 +125,7 @@ export default function Pricing() {
                 ))}
               </ul>
               <button
+                onClick={() => handleCTA(plan.name)}
                 className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
                   plan.highlighted
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
@@ -114,5 +139,5 @@ export default function Pricing() {
         </div>
       </div>
     </section>
-  );
+  )
 }
