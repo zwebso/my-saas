@@ -1,42 +1,36 @@
 // @ts-nocheck
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import Link from 'next/link'
-import type { User } from '@supabase/supabase-js'
-  const router = useRouter()
+
 export default function Dashboard() {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    const getUser = async () => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
       setLoading(false)
     }
-
     getUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null)
-    })
-
-    return () => {
-      subscription?.unsubscribe()
-    }
   }, [])
 
-  const handleLogout = async () => {
+  const signOut = async () => {
     await supabase.auth.signOut()
-    window.location.href = '/'
+    router.push('/')
   }
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Loading...</p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
       </div>
     )
   }
@@ -45,9 +39,13 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Please sign in first</p>
-          <Link href="/auth" className="text-blue-600 hover:underline">
-            Go to Sign In
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
+          <p className="text-gray-600 mb-6">Please sign in to access the dashboard.</p>
+          <Link 
+            href="/auth"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+          >
+            Sign In
           </Link>
         </div>
       </div>
@@ -55,57 +53,59 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <nav className="bg-white shadow">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-blue-600">
-            PDF Merge Tool
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-gray-700">{user.email}</span>
-            <button
-              onClick={handleLogout}
-              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-colors"
-            >
-              Logout
-            </button>
+    <div className="min-h-screen bg-gray-50">
+      <nav className="bg-white shadow-sm border-b">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+            <div className="flex items-center space-x-4">
+              <span className="text-gray-600">Welcome, {user && user.email}</span>
+              <button
+                onClick={signOut}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+              >
+                Sign Out
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-lg shadow-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Welcome, {user.email}!
-          </h1>
-          <p className="text-gray-600 mb-8">
-            You're now signed in. Explore your dashboard and manage your PDFs.
-          </p>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Your Files</h3>
-              <p className="text-gray-600">Manage your uploaded PDF files</p>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">History</h3>
-              <p className="text-gray-600">View your merge history</p>
-            </div>
-            <div className="bg-blue-50 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Settings</h3>
-              <p className="text-gray-600">Manage your account settings</p>
-            </div>
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">PDF Merger</h2>
+            <p className="text-gray-600 mb-4">
+              Merge multiple PDF files into a single document.
+            </p>
+            <Link
+              href="/"
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              Use Tool
+            </Link>
           </div>
 
-          <Link
-            href="/"
-            className="mt-8 inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition-colors"
-          >
-            Back to Home
-          </Link>
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Account Settings</h2>
+            <p className="text-gray-600 mb-4">
+              Manage your account preferences and settings.
+            </p>
+            <button className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm transition-colors">
+              Settings
+            </button>
+          </div>
+
+          <div className="bg-white p-6 rounded-lg shadow-sm border">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Usage Stats</h2>
+            <p className="text-gray-600 mb-4">
+              View your PDF processing usage and limits.
+            </p>
+            <div className="text-2xl font-bold text-blue-600">0 PDFs</div>
+            <p className="text-sm text-gray-500">processed this month</p>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
-// Build: 1769002536
